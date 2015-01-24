@@ -12,7 +12,7 @@ var circle = new Pixis.Circle({
     stroke: 0xA8ADBF, 
     strokeWidth: 1, 
     strokeOpacity: 0.3, 
-    fill: 0xAB946D 
+    fill: 0xAB946D, 
     radius: 5, 
     blur: 50 
 }); 
@@ -23,7 +23,7 @@ stage.add(circle);
 // create an animation 
 var tween = stage.tween(circle, 0.5, { 
     fill: 0x4D4B69, 
-    strokeOpacity: 1 
+    strokeOpacity: 1, 
     x: 500, 
     y: 390, 
     blur: 0 
