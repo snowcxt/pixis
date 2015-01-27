@@ -3,7 +3,7 @@ Inspired by [KineticJS](https://github.com/lavrton/KineticJS) and based on [pixi
 
 ### Example
 
-[Live Demo](http://pixis.anydoes.com/demo.html)
+[Live Demo](http://snowcxt.github.io/pixis/demo.html)
 
 ```javascript
 // create a 800x400 stage
