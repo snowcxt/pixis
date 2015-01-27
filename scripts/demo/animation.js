@@ -1,5 +1,5 @@
-﻿// create a 700x350 stage
-var stage = new Pixis.Stage(700, 350, document.getElementById("stage"));
+﻿// create a 700x200 stage
+var stage = new Pixis.Stage(700, 200, document.getElementById("stage"));
 
 // create a path
 var path = new Pixis.Path({
@@ -22,14 +22,14 @@ function progress(animation) {
 
 // create an animation
 var tween = path.tween(2, {
-    x: 600,
-    y: 250,
+    x: 630,
+    y: 120,
     stroke: 0xF03765,
     strokeWidth: 5,
     fill: 0xD9C175,
     opacity: 1,
-    scaleX: 2,
-    scaleY: -2,
+    scaleX: 1.5,
+    scaleY: -1,
     rotation: -Math.PI / 2
 }, Pixis.Easings.BounceEaseIn);
 
