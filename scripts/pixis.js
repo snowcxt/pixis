@@ -22,28 +22,25 @@ var Pixis;
             this.animStatus = AnimStatuses.stopped;
             this.runAnimation = function () {
                 var thisLoop = new Date;
-                var timeSpan = thisLoop - _this.lastLoop;
+                var timeSpan = (thisLoop - _this.lastLoop) / 1000;
                 _this.lastLoop = thisLoop;
                 if (_this.animStatus == AnimStatuses.running) {
                     var i = 0, l = _this.animations.length, anim;
                     while (i < l) {
                         anim = _this.animations[i];
-                        if (!anim.stopped && anim.total != null) {
+                        if (!anim.stopped) {
                             if (anim.animate(timeSpan, anim.tag)) {
                                 i++;
                             }
                             else {
                                 anim.stopped = true;
-                                anim.terminate(anim.tag);
+                                anim.finish(anim);
                                 _this.animations.splice(i, 1);
                                 l--;
                             }
                         }
                         else {
-                            if (!anim.stopped) {
-                                anim.stopped = true;
-                                anim.terminate(anim.tag);
-                            }
+                            anim.finish(anim);
                             _this.animations.splice(i, 1);
                             l--;
                         }
@@ -77,11 +74,14 @@ var Pixis;
             }
         }
         Stage.prototype.add = function (shape) {
-            shape.stage = this;
+            shape.parent = this;
             this.stage.addChild(shape.shape);
         };
         Stage.prototype.addChild = function (object) {
             this.stage.addChild(object);
+        };
+        Stage.prototype.getStage = function () {
+            return this;
         };
         Stage.prototype.draw = function () {
             this.renderer.render(this.stage);
@@ -95,8 +95,8 @@ var Pixis;
             }
         };
         Stage.prototype.startAnim = function (animateFunc) {
-            this.addAnimation(new Pixis.Animation(function (timespan) {
-                animateFunc(timespan);
+            this.addAnimation(new Pixis.Animation(function (animation) {
+                animateFunc(animation);
                 return true;
             }, null));
         };
@@ -109,7 +109,7 @@ var Pixis;
     Pixis.Stage = Stage;
     var Shape = (function () {
         function Shape(shape, config) {
-            this.stage = null;
+            this.parent = null;
             this.shape = shape;
             config = Util.extend({
                 x: 0,
@@ -220,7 +220,7 @@ var Pixis;
                 shape: this,
                 duration: duration,
                 to: to
-            }, [], easing);
+            }, easing);
         };
         return Shape;
     })();
@@ -323,36 +323,35 @@ var Pixis;
             var _this = this;
             this.stopped = false;
             this.elapse = 0;
-            Pixis.Util.extend(opts, opts || {
+            opts = Pixis.Util.extend({
                 isToward: true,
                 finished: function () {
                 }
-            });
+            }, opts || {});
             this.tag = opts.tag;
             this.isToward = opts.isToward;
-            this.total = length ? length * 1000 : null;
+            this.total = length ? length : null;
             if (!this.isToward) {
                 this.elapse = this.total;
             }
             this.animate = function (timespan) {
-                if (_this.isTerminated(timespan))
-                    return false;
-                return animate(timespan, _this.tag);
+                var isTerminated = _this.isTerminated(timespan), result = animate(_this);
+                return !isTerminated && result;
             };
-            this.terminate = opts.finished;
+            this.finish = opts.finish;
         }
         Animation.prototype.isTerminated = function (span) {
-            if (this.total) {
+            if (this.total !== null) {
                 if (this.isToward) {
                     this.elapse += span;
                     if (this.elapse >= this.total) {
-                        return true;
+                        this.elapse = this.total;
                     }
                 }
                 else {
                     this.elapse -= span;
                     if (this.elapse <= 0) {
-                        return true;
+                        this.elapse = 0;
                     }
                 }
             }
@@ -362,7 +361,7 @@ var Pixis;
     })();
     Pixis.Animation = Animation;
     var Tween = (function () {
-        function Tween(config, tweens, easing) {
+        function Tween(config, easing) {
             var _this = this;
             this.begin = {};
             this.change = {};
@@ -409,28 +408,35 @@ var Pixis;
                     }
                 }
                 _this.shape.setAttrs(attrs);
+                _this.progress(_this.animation);
                 return true;
             }, this.duration, { isToward: this.toward });
             this.animation.stopped = true;
         }
-        Tween.prototype.animate = function (done) {
+        Tween.prototype.animate = function (callback) {
+            callback = callback || {};
+            this.progress = callback.progress || (function () {
+            });
             this.animation.isToward = this.toward;
-            this.animation.terminate = done || (function () {
+            this.animation.finish = callback.done || (function () {
             });
             return this.resume();
         };
-        Tween.prototype.play = function (done) {
+        Tween.prototype.play = function (callback) {
             this.toward = true;
-            return this.animate(done);
+            return this.animate(callback);
         };
-        Tween.prototype.reverse = function (done) {
+        Tween.prototype.reverse = function (callback) {
             this.toward = false;
-            return this.animate(done);
+            return this.animate(callback);
         };
-        Tween.prototype.replay = function (done) {
+        Tween.prototype.replay = function (callback) {
             this.toward = true;
             this.animation.elapse = 0;
-            return this.animate(done);
+            return this.animate(callback);
+        };
+        Tween.prototype.seek = function (postion) {
+            this.animation.elapse = postion * 1000;
         };
         Tween.prototype.pause = function () {
             if (this.animation) {
@@ -439,9 +445,13 @@ var Pixis;
             return this;
         };
         Tween.prototype.resume = function () {
-            if (this.shape.stage && this.animation && this.animation.stopped) {
-                this.animation.stopped = false;
-                this.shape.stage.addAnimation(this.animation);
+            var parent = this.shape.parent, stage;
+            if (parent) {
+                stage = parent.getStage();
+                if (stage && this.animation && this.animation.stopped) {
+                    this.animation.stopped = false;
+                    stage.addAnimation(this.animation);
+                }
             }
             return this;
         };
@@ -743,7 +753,11 @@ var Pixis;
             _super.call(this, new PIXI.DisplayObjectContainer(), config);
         }
         Group.prototype.add = function (child) {
+            child.parent = this;
             this.shape.addChild(child.shape);
+        };
+        Group.prototype.getStage = function () {
+            return this.parent.getStage();
         };
         Group.prototype.removeAll = function () {
             var shape = this.shape;
