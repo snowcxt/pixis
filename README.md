@@ -5,6 +5,10 @@ Inspired by [KineticJS](https://github.com/lavrton/KineticJS) and based on [pixi
 
 [Live Demo](http://snowcxt.github.io/pixis/#/animationdemo)
 
+### Documation
+
+[Api](http://snowcxt.github.io/pixis/doc/globals.html)
+
 ### Todo's
  - Upload souce code
  - Documentation
