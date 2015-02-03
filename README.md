@@ -1,19 +1,21 @@
 # Pixis.JS
-Inspired by [KineticJS](https://github.com/lavrton/KineticJS) and based on [pixi.js](https://github.com/GoodBoyDigital/pixi.js/). With “Pixis” you can easily create any shapes, like circle, rectangle, star or svg path, and move, resize, change color. Even animate the shape.
+An extension of [pixi.js](https://github.com/GoodBoyDigital/pixi.js/) - a super fast HTML 5 2D rendering engine that uses webGL with canvas fallback
+
+With "pixis.js" you can easily create any shapes, like circles, rectangles, stars and svg paths. Then move, resize, change color and animate them.
 
 ### Example
-[Live Demo](http://snowcxt.github.io/pixis/#/animationdemo)
+[Live Demo](http://snowcxt.github.io/pixis)
 
 ### Documation
-[Api](http://snowcxt.github.io/pixis/doc/globals.html)
+[Api](http://snowcxt.github.io/pixis/doc)
 
 ### Download link
-[bin/pixis.js]()
+[bin/pixis.js](https://raw.githubusercontent.com/snowcxt/pixis/master/bin/pixis.js)
 
 ### Folder structure
- - Source code: [src]()
- - TypeScript DefinitelyTyped: [src/PixiShape/pixi/pixis.d.ts]()
- - Download link: [bin/pixis.js]()
+ - Source code: [src](https://github.com/snowcxt/pixis/tree/master/src)
+ - TypeScript DefinitelyTyped: [src/PixiShape/pixi/pixis.d.ts](https://raw.githubusercontent.com/snowcxt/pixis/master/src/PixiShape/pixi/pixi.d.ts)
+ - Download link: [bin/pixis.js](https://raw.githubusercontent.com/snowcxt/pixis/master/bin/pixis.js)
 
 ### Todo's
  - Documentation
